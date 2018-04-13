@@ -333,7 +333,7 @@ void WorkStateFSM(void)
 				if (enemy_lost > 100) 
 				{
 					WorkState = DEFEND_STATE;
-					ChassisSpeedRef.forward_back_ref = odometry_speed1;
+//					ChassisSpeedRef.forward_back_ref = odometry_speed1;
 					enemy_lost = 0;
 				}
 			}
@@ -476,7 +476,7 @@ void controlLoop()
 		enemy_yaw_out = enemy_yaw_err *  auto_attack_yaw_kp + (enemy_yaw_err - enemy_yaw_err_last)*auto_attack_yaw_kd;
 		if (enemy_yaw_out>60) enemy_yaw_out = 60;
 		else if (enemy_yaw_out<-60) enemy_yaw_out = -60;
-		yawSpeedTarget = -enemy_yaw_out;
+		yawSpeedTarget = enemy_yaw_out;
 		
 		static float enemy_pitch_err_last = 0;
 		enemy_pitch_err = (float)((int16_t)PITCH_OFFSET - enemy_pitch);
