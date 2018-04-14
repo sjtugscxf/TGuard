@@ -326,6 +326,17 @@ void WorkStateFSM(void)
 		}break;
 		case ATTACK_STATE:  //??????
 		{
+			if(enemy_detect_cnt>1000)    //2s??????????????
+			{
+				WorkState = DEFEND_STATE;
+				enemy_yaw = YAW_OFFSET;
+				enemy_pitch = PITCH_OFFSET;
+			}
+			else
+			{
+				enemy_detect_cnt++;
+			}
+			
 			static int enemy_lost = 0;
 			if (find_enemy == 0) 
 			{
@@ -333,6 +344,8 @@ void WorkStateFSM(void)
 				if (enemy_lost > 100) 
 				{
 					WorkState = DEFEND_STATE;
+					enemy_yaw = YAW_OFFSET;
+					enemy_pitch = PITCH_OFFSET;
 //					ChassisSpeedRef.forward_back_ref = odometry_speed1;
 					enemy_lost = 0;
 				}
@@ -422,91 +435,80 @@ float enemy_pitch_out = 0;
 uint16_t disturb_init = 0;
 uint16_t disturb_cnt = 0;
 float disturb_angle = 8000.0;
+
+void Defend_Action()
+{
+	yawSpeedTarget = 120.0;
+	//yawSpeedTarget = 0;
+	//if(odometry < odometry_downmax1) ChassisSpeedRef.forward_back_ref = odometry_speed1;
+	//if(odometry > odometry_upmax1) ChassisSpeedRef.forward_back_ref = -odometry_speed1;
+}
+
+void Attack_Action()
+{
+	//if(odometry < odometry_downmax2) ChassisSpeedRef.forward_back_ref = odometry_speed2;
+	//if(odometry > odometry_upmax2) ChassisSpeedRef.forward_back_ref = -odometry_speed2;
+	ChassisSpeedRef.forward_back_ref = 0.0;
+		
+	static float enemy_yaw_err_last = 0;
+	enemy_yaw_err = (float)((int16_t)YAW_OFFSET - enemy_yaw);
+	//enemy_yaw_out = enemy_yaw_err/10 * fabs(enemy_yaw_err)  * AUTO_ATTACK_YAW_KP + (enemy_yaw_err - enemy_yaw_err_last)*AUTO_ATTACK_YAW_KD;
+	enemy_yaw_out = enemy_yaw_err *  auto_attack_yaw_kp + (enemy_yaw_err - enemy_yaw_err_last)*auto_attack_yaw_kd;
+	if (enemy_yaw_out>60) enemy_yaw_out = 60;
+	else if (enemy_yaw_out<-60) enemy_yaw_out = -60;
+	yawSpeedTarget = enemy_yaw_out;
+		
+	static float enemy_pitch_err_last = 0;
+	enemy_pitch_err = (float)((int16_t)PITCH_OFFSET - enemy_pitch);
+	//enemy_pitch_out = enemy_pitch_err/10 * fabs(enemy_pitch_err) * AUTO_ATTACK_PITCH_KP + (enemy_pitch_err - enemy_pitch_err_last)*AUTO_ATTACK_PITCH_KD;
+	enemy_pitch_out = enemy_pitch_err * auto_attack_pitch_kp + (enemy_pitch_err - enemy_pitch_err_last)*auto_attack_pitch_kd;
+	if (enemy_pitch_out>1) enemy_pitch_out = 1;
+	else if (enemy_pitch_out<-1) enemy_pitch_out = -1;
+	pitchAngleTarget -= enemy_pitch_out;
+		
+	if(enemy_yaw_err<100 && enemy_yaw_err>-100 && enemy_pitch_err<75 && enemy_pitch_err>-75) ShootState = SHOOTING;
+	else ShootState = NOSHOOTING;
+}
 //?????
 void controlLoop()
 {
-	if(enemy_detect_cnt>1000)    //2s??????????????
-	{
-		enemy_yaw = YAW_OFFSET;
-		enemy_pitch = PITCH_OFFSET;
-	}
-	else
-	{
-		enemy_detect_cnt++;
-	}
-	
 	WorkStateFSM();
 	
-	if(WorkState == DEFEND_STATE)
-	{
-		yawSpeedTarget = 120.0;
-		//yawSpeedTarget = 0;
-		//if(odometry < odometry_downmax1) ChassisSpeedRef.forward_back_ref = odometry_speed1;
-		//if(odometry > odometry_upmax1) ChassisSpeedRef.forward_back_ref = -odometry_speed1;
-	}
-	
-	if(FrictionWheelState == FRICTION_WHEEL_ON)
-	{
-		if (disturb_init)
-		{
-			disturb_cnt++;
-			if(disturb_cnt > 2000)
-			{
-				bullet_angle_target = - bullet_angle_target;
-				disturb_cnt = 0;
-			}
-		}
-		else
-		{
-			disturb_init = 1;
-			bullet_angle_target = disturb_angle;
-			disturb_cnt = 0;
-		}
-	}
-	
-	if(WorkState == ATTACK_STATE)
-	{
-	  //if(odometry < odometry_downmax2) ChassisSpeedRef.forward_back_ref = odometry_speed2;
-		//if(odometry > odometry_upmax2) ChassisSpeedRef.forward_back_ref = -odometry_speed2;
-		ChassisSpeedRef.forward_back_ref = 0.0;
-		
-		static float enemy_yaw_err_last = 0;
-		enemy_yaw_err = (float)((int16_t)YAW_OFFSET - enemy_yaw);
-		//enemy_yaw_out = enemy_yaw_err/10 * fabs(enemy_yaw_err)  * AUTO_ATTACK_YAW_KP + (enemy_yaw_err - enemy_yaw_err_last)*AUTO_ATTACK_YAW_KD;
-		enemy_yaw_out = enemy_yaw_err *  auto_attack_yaw_kp + (enemy_yaw_err - enemy_yaw_err_last)*auto_attack_yaw_kd;
-		if (enemy_yaw_out>60) enemy_yaw_out = 60;
-		else if (enemy_yaw_out<-60) enemy_yaw_out = -60;
-		yawSpeedTarget = enemy_yaw_out;
-		
-		static float enemy_pitch_err_last = 0;
-		enemy_pitch_err = (float)((int16_t)PITCH_OFFSET - enemy_pitch);
-		//enemy_pitch_out = enemy_pitch_err/10 * fabs(enemy_pitch_err) * AUTO_ATTACK_PITCH_KP + (enemy_pitch_err - enemy_pitch_err_last)*AUTO_ATTACK_PITCH_KD;
-		enemy_pitch_out = enemy_pitch_err * auto_attack_pitch_kp + (enemy_pitch_err - enemy_pitch_err_last)*auto_attack_pitch_kd;
-		if (enemy_pitch_out>1) enemy_pitch_out = 1;
-		else if (enemy_pitch_out<-1) enemy_pitch_out = -1;
-		pitchAngleTarget -= enemy_pitch_out;
-		
-		if(enemy_yaw_err<100 && enemy_yaw_err>-100 && enemy_pitch_err<75 && enemy_pitch_err>-75) ShootState = SHOOTING;
-		else ShootState = NOSHOOTING;
-	}
-	
-	if(WorkState != STOP_STATE && WorkState != START_STATE) 
+	if(WorkState != START_STATE) 
 	{
 		odometryLoop();
+		
+		if(WorkState == DEFEND_STATE)
+		{
+			Defend_Action();
+		}
+		
+		if(WorkState == ATTACK_STATE)
+		{
+			Attack_Action();
+		}
 		
 		ControlYawSpeed();
 		ControlPitch();
 		
-		//pitchIntensity = 0;
-		
+		if(WorkState == STOP_STATE)
+		{
+			yawIntensity = 0;
+			pitchIntensity = 0;
+		}
 		setGMMotor();
 		
 		ControlCMFL();
 		ControlCMFR();
 		ControlBullet();
-		//ControlBullet2();
-		//setBulletWithAngle(bullet_angle_target + bullet_zero_angle);
-		//setBullet2WithAngle(bullet2_angle_target + bullet2_zero_angle);
+		
+		if(WorkState == STOP_STATE)
+		{
+			CMFLIntensity = 0;
+			CMFRIntensity = 0;
+			BulletIntensity = 0;
+			Bullet2Intensity = 0;
+		}
 		setCMMotor();
 	}
 }
