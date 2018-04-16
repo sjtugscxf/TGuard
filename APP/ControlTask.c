@@ -225,9 +225,9 @@ void setBullet2WithAngle(double targetAngle){//360.0 * 12 * 2
 
 float odometry = 0.0;
 float odometry_fact = 0.01;
-float odometry_upmax1 = 80000.0;
-float odometry_downmax1 = -80000.0;
-float odometry_speed1 = 50.0;
+float odometry_upmax1 = 60000.0;
+float odometry_downmax1 = -60000.0;
+float odometry_speed1 = 80.0;
 float odometry_upmax2 = 10000.0;
 float odometry_downmax2 = -10000.0;
 float odometry_speed2 = 15.0;
@@ -287,8 +287,7 @@ void WorkStateFSM(void)
 				//if(frictionRamp.IsOverflow(&frictionRamp))
 				//{
 					WorkState = DEFEND_STATE;//?????????
-				  //odometry = 0.0;
-					//ChassisSpeedRef.forward_back_ref = odometry_speed1;
+				  odometry = 0.0;
 				//	FrictionWheelState = FRICTION_WHEEL_ON;
 				//}
 			}
@@ -346,7 +345,6 @@ void WorkStateFSM(void)
 					WorkState = DEFEND_STATE;
 					enemy_yaw = YAW_OFFSET;
 					enemy_pitch = PITCH_OFFSET;
-//					ChassisSpeedRef.forward_back_ref = odometry_speed1;
 					enemy_lost = 0;
 				}
 			}
@@ -403,7 +401,7 @@ fw_PID_Regulator_t pitchSpeedPID = fw_PID_INIT(6.5, 0.0, 0.0, 10000.0, 10000.0, 
 //fw_PID_Regulator_t yawSpeedPID = fw_PID_INIT(30.0, 0.0, 0, 10000.0, 10000.0, 10000.0, 4000.0);
 fw_PID_Regulator_t yawSpeedPID = fw_PID_INIT(10.0, 0.0, 0, 10000.0, 10000.0, 10000.0, 2000.0);
 #define yaw_zero 7200  //100
-#define pitch_zero 3043
+#define pitch_zero 5796
 float yawRealAngle = 0.0;
 float pitchRealAngle = 0.0;
 float gap_angle = 0.0;
@@ -436,12 +434,38 @@ uint16_t disturb_init = 0;
 uint16_t disturb_cnt = 0;
 float disturb_angle = 8000.0;
 
+uint8_t pitch_dir = 0;
+#define YAW_DEFEND_SPEED       240.0f
+#define PITCH_DEFEND_SPEED       0.2f
+uint8_t up_dir = 0;
+
 void Defend_Action()
 {
-	yawSpeedTarget = 120.0;
-	//yawSpeedTarget = 0;
-	//if(odometry < odometry_downmax1) ChassisSpeedRef.forward_back_ref = odometry_speed1;
-	//if(odometry > odometry_upmax1) ChassisSpeedRef.forward_back_ref = -odometry_speed1;
+	if(pitchAngleTarget > 88.0)
+	{
+		pitch_dir = 0;
+	}
+	else if(pitchAngleTarget < -78.0)
+	{
+		pitch_dir = 1;
+	}
+	
+	if (pitch_dir == 0)
+	{
+		pitchAngleTarget -= PITCH_DEFEND_SPEED;
+	}
+	else if (pitch_dir == 1)
+	{
+		pitchAngleTarget += PITCH_DEFEND_SPEED;
+	}
+	
+	yawSpeedTarget = YAW_DEFEND_SPEED;
+	
+	if(odometry < odometry_downmax1) up_dir = 0;
+	if(odometry > odometry_upmax1) up_dir = 1;
+	
+	if(up_dir == 0) ChassisSpeedRef.forward_back_ref = odometry_speed1;
+	else if(up_dir == 1) ChassisSpeedRef.forward_back_ref = -odometry_speed1;
 }
 
 void Attack_Action()
