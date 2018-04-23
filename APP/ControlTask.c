@@ -464,8 +464,16 @@ void Defend_Action()
 	if(odometry < odometry_downmax1) up_dir = 0;
 	if(odometry > odometry_upmax1) up_dir = 1;
 	
-	if(up_dir == 0) ChassisSpeedRef.forward_back_ref = odometry_speed1;
-	else if(up_dir == 1) ChassisSpeedRef.forward_back_ref = -odometry_speed1;
+	if(up_dir == 0) 
+	{
+		if (ChassisSpeedRef.forward_back_ref < odometry_speed1) ChassisSpeedRef.forward_back_ref += 1;
+		else ChassisSpeedRef.forward_back_ref = odometry_speed1;
+	}
+	else if(up_dir == 1) 
+	{
+		if (ChassisSpeedRef.forward_back_ref > -odometry_speed1) ChassisSpeedRef.forward_back_ref -= 1;
+		else ChassisSpeedRef.forward_back_ref = -odometry_speed1;
+	}
 }
 
 void Attack_Action()
