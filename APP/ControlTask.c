@@ -225,9 +225,9 @@ void setBullet2WithAngle(double targetAngle){//360.0 * 12 * 2
 
 float odometry = 0.0;
 float odometry_fact = 0.01;
-float odometry_upmax1 = 60000.0;
-float odometry_downmax1 = -60000.0;
-float odometry_speed1 = 80.0;
+float odometry_upmax1 = 90000.0;
+float odometry_downmax1 = -90000.0;
+float odometry_speed1 = 160.0;
 float odometry_upmax2 = 10000.0;
 float odometry_downmax2 = -10000.0;
 float odometry_speed2 = 15.0;
@@ -435,8 +435,8 @@ uint16_t disturb_cnt = 0;
 float disturb_angle = 8000.0;
 
 uint8_t pitch_dir = 0;
-#define YAW_DEFEND_SPEED       240.0f
-#define PITCH_DEFEND_SPEED       0.2f
+#define YAW_DEFEND_SPEED       300.0f
+#define PITCH_DEFEND_SPEED       0.3f
 uint8_t up_dir = 0;
 
 void Defend_Action()
