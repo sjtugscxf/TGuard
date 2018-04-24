@@ -223,6 +223,12 @@ void setBullet2WithAngle(double targetAngle){//360.0 * 12 * 2
 		Bullet2Intensity = Bullet2SpeedPID.output;
 }
 
+unsigned char testred1 = 0;
+unsigned char testred2 = 0;
+unsigned char testred3 = 0;
+unsigned char testred4 = 0;
+unsigned char calicnt = 0;
+
 float odometry = 0.0;
 float odometry_fact = 0.01;
 float odometry_upmax1 = 90000.0;
@@ -233,6 +239,18 @@ float odometry_downmax2 = -10000.0;
 float odometry_speed2 = 15.0;
 void odometryLoop()
 {
+	testred1 = redBuf & 0x01;
+	testred2 = (redBuf & 0x02)>>1;
+	testred3 = (redBuf & 0x04)>>2;
+	testred4 = (redBuf & 0x08)>>3;
+	
+	if(testred1 == 0)
+	{
+		calicnt++;
+		if(calicnt>10) odometry = 0.0;
+	}
+	else calicnt = 0;
+	
 	if((CMFLRx.RotateSpeed > 50 || CMFLRx.RotateSpeed < -50) && (CMFRRx.RotateSpeed > 50 || CMFRRx.RotateSpeed < -50))
 	{
 		odometry += (CMFLRx.RotateSpeed - CMFRRx.RotateSpeed) * odometry_fact;

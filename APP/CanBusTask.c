@@ -7,6 +7,10 @@ Motor820RRxMsg_t CMFLRx,CMFRRx,BulletRx,Bullet2Rx;
 Motor6623RxMsg_t GMPITCHRx,GMYAWRx;
 
 static uint32_t can_count = 0;
+uint8_t redBuf = 0;
+uint8_t bulletFreq = 0;
+uint16_t shooterHeat0 = 0;
+float bulletSpeed = 0;
 
 void CanReceiveMsgProcess(CanRxMsg * msg)
 {      
@@ -37,8 +41,16 @@ void CanReceiveMsgProcess(CanRxMsg * msg)
 				GMPITCHRx.angle = ((uint16_t)msg->Data[0]<<8)|(uint16_t)msg->Data[1];
 				break;
 			case UPMSG_RXID:
-				//testrecv1 = CMGMCanRxMsg.Data[0];
-			  //testrecv2 = CMGMCanRxMsg.Data[4];
+				redBuf = msg->Data[0];
+				bulletFreq = msg->Data[1];
+				shooterHeat0 = (0x0000 | msg->Data[2]) | (msg->Data[3]<<8);
+				unsigned char * b = NULL;
+				b = (unsigned char*)&bulletSpeed;
+				char c[4] = {0};
+				c[0] = msg->Data[4];c[1] = msg->Data[5];c[2] = msg->Data[6];c[3] = msg->Data[7];
+				for(int i = 0; i<4; i++){
+					b[i] = (unsigned char)c[i];
+				}
 				break;
 			
 				default:
