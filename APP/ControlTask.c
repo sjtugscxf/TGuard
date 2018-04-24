@@ -233,7 +233,7 @@ float odometry = 0.0;
 float odometry_fact = 0.01;
 float odometry_upmax1 = 90000.0;
 float odometry_downmax1 = -90000.0;
-float odometry_speed1 = 160.0;
+float odometry_speed1 = 200.0;
 float odometry_upmax2 = 10000.0;
 float odometry_downmax2 = -10000.0;
 float odometry_speed2 = 15.0;
@@ -484,12 +484,12 @@ void Defend_Action()
 	
 	if(up_dir == 0) 
 	{
-		if (ChassisSpeedRef.forward_back_ref < odometry_speed1) ChassisSpeedRef.forward_back_ref += 1;
+		if (ChassisSpeedRef.forward_back_ref < odometry_speed1) ChassisSpeedRef.forward_back_ref += 0.2;
 		else ChassisSpeedRef.forward_back_ref = odometry_speed1;
 	}
 	else if(up_dir == 1) 
 	{
-		if (ChassisSpeedRef.forward_back_ref > -odometry_speed1) ChassisSpeedRef.forward_back_ref -= 1;
+		if (ChassisSpeedRef.forward_back_ref > -odometry_speed1) ChassisSpeedRef.forward_back_ref -= 0.2;
 		else ChassisSpeedRef.forward_back_ref = -odometry_speed1;
 	}
 }
@@ -550,6 +550,8 @@ void controlLoop()
 		
 		ControlCMFL();
 		ControlCMFR();
+		
+		if(shooterHeat0 > 4000) bullet_ref = 0;
 		ControlBullet();
 		
 		if(WorkState == STOP_STATE)
