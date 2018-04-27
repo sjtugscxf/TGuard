@@ -57,10 +57,12 @@ void RemoteShootControl(RemoteSwitch_t *sw, uint8_t val)
 			else if(sw->switch_value_raw == 2)
 			{
 				ShootState = SHOOTING;
+				LASER_ON();
 			}
 			else
 			{
 				ShootState = NOSHOOTING;
+				LASER_OFF();
 			}					 
 		} break;				
 	}
@@ -103,7 +105,7 @@ void RemoteControlProcess(Remote *rc)
 	{
 		ChassisSpeedRef.forward_back_ref = (rc->ch1 - (int16_t)REMOTE_CONTROLLER_STICK_OFFSET) * STICK_TO_CHASSIS_SPEED_REF_FACT;
 		//ChassisSpeedRef.left_right_ref   = (rc->ch0 - (int16_t)REMOTE_CONTROLLER_STICK_OFFSET) * STICK_TO_CHASSIS_SPEED_REF_FACT; 
-		if(shooterHeat0 > 4000) bullet_ref = 0;
+		if(shooterHeat0 > 3500) bullet_ref = 0;
 		else bullet_ref = (rc->ch0 - (int16_t)REMOTE_CONTROLLER_STICK_OFFSET) * STICK_TO_BULLET_SPEED_REF_FACT;
 		//bullet2_ref = (rc->ch0 - (int16_t)REMOTE_CONTROLLER_STICK_OFFSET) * STICK_TO_CHASSIS_SPEED_REF_FACT * 1.5;
 		//bullet_angle_target += (rc->ch1 - (int16_t)REMOTE_CONTROLLER_STICK_OFFSET) * STICK_TO_BULLET_POSITION_REF_FACT;
@@ -120,8 +122,8 @@ void RemoteControlProcessAuto(Remote *rc)
 {
 	if(WorkState == DEFEND_STATE || WorkState == ATTACK_STATE)
 	{
-		if(shooterHeat0 > 4000) bullet_ref = 0;
-		else bullet_ref = (rc->ch0 - (int16_t)REMOTE_CONTROLLER_STICK_OFFSET) * STICK_TO_CHASSIS_SPEED_REF_FACT * 0.2;
+		//if(shooterHeat0 > 4000) bullet_ref = 0;
+		//else bullet_ref = (rc->ch0 - (int16_t)REMOTE_CONTROLLER_STICK_OFFSET) * STICK_TO_CHASSIS_SPEED_REF_FACT * 0.2;
 		//bullet2_ref = (rc->ch0 - (int16_t)REMOTE_CONTROLLER_STICK_OFFSET) * STICK_TO_CHASSIS_SPEED_REF_FACT * 1.5;
 		//bullet_angle_target += (rc->ch1 - (int16_t)REMOTE_CONTROLLER_STICK_OFFSET) * STICK_TO_BULLET_POSITION_REF_FACT;
 		//bullet2_angle_target += (rc->ch0 - (int16_t)REMOTE_CONTROLLER_STICK_OFFSET) * STICK_TO_BULLET_POSITION_REF_FACT;
@@ -219,7 +221,7 @@ void RemoteDataPrcess(uint8_t *pData)
 		}break;
 		case AUTO:              
 		{
-			RemoteControlProcessAuto(&(RC_CtrlData.rc));
+			//RemoteControlProcessAuto(&(RC_CtrlData.rc));
 		}break;
 		case STOP:               
 		{

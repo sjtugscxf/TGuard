@@ -11,6 +11,7 @@ uint8_t redBuf = 0;
 uint8_t bulletFreq = 0;
 uint16_t shooterHeat0 = 0;
 float bulletSpeed = 0;
+uint8_t bulletSpeedBuf[4] = {0};
 
 void CanReceiveMsgProcess(CanRxMsg * msg)
 {      
@@ -50,6 +51,7 @@ void CanReceiveMsgProcess(CanRxMsg * msg)
 				c[0] = msg->Data[4];c[1] = msg->Data[5];c[2] = msg->Data[6];c[3] = msg->Data[7];
 				for(int i = 0; i<4; i++){
 					b[i] = (unsigned char)c[i];
+					bulletSpeedBuf[i] = msg->Data[i+4];
 				}
 				break;
 			

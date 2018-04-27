@@ -41,5 +41,6 @@ extern uint8_t redBuf;
 extern uint8_t bulletFreq;
 extern uint16_t shooterHeat0;
 extern float bulletSpeed;
+extern uint8_t bulletSpeedBuf[4];
 #endif
 
