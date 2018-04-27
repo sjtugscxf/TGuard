@@ -477,22 +477,24 @@ void Defend_Action()
 		pitchAngleTarget += PITCH_DEFEND_SPEED;
 	}
 	
-	//yawSpeedTarget = YAW_DEFEND_SPEED;
-	yawSpeedTarget = 0;
+	yawSpeedTarget = YAW_DEFEND_SPEED;
+	//yawSpeedTarget = 0;
 	
 	if(odometry < odometry_downmax1) up_dir = 0;
 	if(odometry > odometry_upmax1) up_dir = 1;
 	
-//	if(up_dir == 0) 
-//	{
-//		if (ChassisSpeedRef.forward_back_ref < odometry_speed1) ChassisSpeedRef.forward_back_ref += 0.2;
-//		else ChassisSpeedRef.forward_back_ref = odometry_speed1;
-//	}
-//	else if(up_dir == 1) 
-//	{
-//		if (ChassisSpeedRef.forward_back_ref > -odometry_speed1) ChassisSpeedRef.forward_back_ref -= 0.2;
-//		else ChassisSpeedRef.forward_back_ref = -odometry_speed1;
-//	}
+	if(up_dir == 0) 
+	{
+		if (ChassisSpeedRef.forward_back_ref < odometry_speed1) ChassisSpeedRef.forward_back_ref += 0.2;
+		else ChassisSpeedRef.forward_back_ref = odometry_speed1;
+	}
+	else if(up_dir == 1) 
+	{
+		if (ChassisSpeedRef.forward_back_ref > -odometry_speed1) ChassisSpeedRef.forward_back_ref -= 0.2;
+		else ChassisSpeedRef.forward_back_ref = -odometry_speed1;
+	}
+	
+	bullet_ref = 0;
 }
 uint8_t catchedcnt =  0 ;
 void Attack_Action()
@@ -521,7 +523,7 @@ void Attack_Action()
 		
 	if(enemy_yaw_err<60 && enemy_yaw_err>-60 && enemy_pitch_err<40 && enemy_pitch_err>-40) 
 	{
-		catchedcnt++;
+		if (catchedcnt < 201) catchedcnt++;
 		if (catchedcnt > 200) bullet_ref = 800;
 		else bullet_ref = 0;
 	}

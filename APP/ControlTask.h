@@ -47,8 +47,8 @@ int16_t PID_PROCESS_Speed(fw_PID_Regulator_t pid_speed,float target, float veloc
 #define AUTO_ATTACK_YAW_KD      0 
 #define AUTO_ATTACK_PITCH_KP      0.0005f
 #define AUTO_ATTACK_PITCH_KD      0 
-#define YAW_OFFSET         330u  
-#define PITCH_OFFSET       220u  
+#define YAW_OFFSET         320u  
+#define PITCH_OFFSET       210u  
 #define CHASSIS_SPEED_ATTENUATION   (1.30f)
 #define CHASSIS_MOTOR_ROTATE_PID_DEFAULT \
 {\
