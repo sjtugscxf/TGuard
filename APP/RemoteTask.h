@@ -7,7 +7,7 @@
 #define CTRL_UART huart3
 #define JUDGE_UART huart3
 
-#define STICK_TO_CHASSIS_SPEED_REF_FACT     0.6f
+#define STICK_TO_CHASSIS_SPEED_REF_FACT     0.8f
 #define STICK_TO_BULLET_SPEED_REF_FACT      1.0f
 #define STICK_TO_BULLET_POSITION_REF_FACT   0.3f
 #define STICK_TO_PITCH_ANGLE_INC_FACT       0.015f
@@ -122,7 +122,7 @@ void InitRemoteControl();
 void RemoteTaskInit();
 
 #define FRICTION_RAMP_TICK_COUNT				100
-#define FRICTION_WHEEL_MAX_DUTY         1350
+#define FRICTION_WHEEL_MAX_DUTY         1300
 #define FRICTION_TIM  htim12
 
 typedef __packed enum

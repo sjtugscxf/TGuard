@@ -228,12 +228,14 @@ unsigned char testred2 = 0;
 unsigned char testred3 = 0;
 unsigned char testred4 = 0;
 unsigned char calicnt = 0;
+unsigned int downcnt = 0;
+unsigned int upcnt = 0;
 
 float odometry = 0.0;
 float odometry_fact = 0.01;
-float odometry_upmax1 = 160000.0;
-float odometry_downmax1 = -160000.0;
-float odometry_speed1 = 240.0;
+float odometry_upmax1 = 180000.0;
+float odometry_downmax1 = -180000.0;
+float odometry_speed1 = 400.0;
 float odometry_upmax2 = 10000.0;
 float odometry_downmax2 = -10000.0;
 float odometry_speed2 = 15.0;
@@ -246,10 +248,24 @@ void odometryLoop()
 	
 	if(testred1 == 0)
 	{
-		calicnt++;
 		if(calicnt>10) odometry = 0.0;
+		else calicnt++;
 	}
 	else calicnt = 0;
+	
+	if(testred2 == 0)
+	{
+		if(downcnt>20) odometry = -200000.0;
+		else downcnt++;
+	}
+	else downcnt = 0;
+	
+	if(testred4 == 0)
+	{
+		if(upcnt>20) odometry = 200000.0;
+		else upcnt++;
+	}
+	else upcnt = 0;
 	
 	if((CMFLRx.RotateSpeed > 50 || CMFLRx.RotateSpeed < -50) && (CMFRRx.RotateSpeed > 50 || CMFRRx.RotateSpeed < -50))
 	{
@@ -305,7 +321,6 @@ void WorkStateFSM(void)
 				//if(frictionRamp.IsOverflow(&frictionRamp))
 				//{
 					WorkState = DEFEND_STATE;//?????????
-				  odometry = 0.0;
 				//	FrictionWheelState = FRICTION_WHEEL_ON;
 				//}
 			}
@@ -438,7 +453,7 @@ void ControlPitch(void)
 	pitchRealAngle = -(GMPITCHRx.angle - pitchZeroAngle) * 360 / 8192.0;
 	NORMALIZE_ANGLE180(pitchRealAngle);
 
-	MINMAX(pitchAngleTarget, -32.0f, 95);
+	MINMAX(pitchAngleTarget, -20.0f, 60);
 				
 	pitchIntensity = -ProcessPitchPID(pitchAngleTarget,pitchRealAngle,-MPU6050_Real_Data.Gyro_X);
 }
@@ -459,11 +474,11 @@ uint8_t up_dir = 0;
 
 void Defend_Action()
 {
-	if(pitchAngleTarget > 93.0)
+	if(pitchAngleTarget > 58.0)
 	{
 		pitch_dir = 0;
 	}
-	else if(pitchAngleTarget < -30.0)
+	else if(pitchAngleTarget < -18.0)
 	{
 		pitch_dir = 1;
 	}
@@ -485,12 +500,12 @@ void Defend_Action()
 	
 	if(up_dir == 0) 
 	{
-		if (ChassisSpeedRef.forward_back_ref < odometry_speed1) ChassisSpeedRef.forward_back_ref += 0.2;
+		if (ChassisSpeedRef.forward_back_ref < odometry_speed1) ChassisSpeedRef.forward_back_ref += 0.4;
 		else ChassisSpeedRef.forward_back_ref = odometry_speed1;
 	}
 	else if(up_dir == 1) 
 	{
-		if (ChassisSpeedRef.forward_back_ref > -odometry_speed1) ChassisSpeedRef.forward_back_ref -= 0.2;
+		if (ChassisSpeedRef.forward_back_ref > -odometry_speed1) ChassisSpeedRef.forward_back_ref -= 0.4;
 		else ChassisSpeedRef.forward_back_ref = -odometry_speed1;
 	}
 	
@@ -521,10 +536,10 @@ void Attack_Action()
 	pitchAngleTarget -= enemy_pitch_out;
 	enemy_pitch_err_last = enemy_pitch_err;
 		
-	if(enemy_yaw_err<60 && enemy_yaw_err>-60 && enemy_pitch_err<40 && enemy_pitch_err>-40) 
+	if(enemy_yaw_err<60 && enemy_yaw_err>-60 && enemy_pitch_err<40 && enemy_pitch_err>-40 && pitchAngleTarget<50) 
 	{
-		if (catchedcnt < 201) catchedcnt++;
-		if (catchedcnt > 200) bullet_ref = 800;
+		if (catchedcnt < 101) catchedcnt++;
+		if (catchedcnt > 100) bullet_ref = 800;
 		else bullet_ref = 0;
 	}
 	else 
