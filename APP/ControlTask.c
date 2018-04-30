@@ -236,9 +236,10 @@ float odometry_fact = 0.01;
 float odometry_upmax1 = 180000.0;
 float odometry_downmax1 = -180000.0;
 float odometry_speed1 = 400.0;
-float odometry_upmax2 = 10000.0;
-float odometry_downmax2 = -10000.0;
-float odometry_speed2 = 15.0;
+float odometry_upmax2 = 70000.0;
+float odometry_downmax2 = -70000.0;
+float odometry_speed2 = 200.0;
+float odometryatt = 0.0;
 void odometryLoop()
 {
 	testred1 = redBuf & 0x01;
@@ -248,21 +249,21 @@ void odometryLoop()
 	
 	if(testred1 == 0)
 	{
-		if(calicnt>10) odometry = 0.0;
+		if(calicnt>4) odometry = 0.0;
 		else calicnt++;
 	}
 	else calicnt = 0;
 	
 	if(testred2 == 0)
 	{
-		if(downcnt>20) odometry = -200000.0;
+		if(downcnt>10) odometry = -200000.0;
 		else downcnt++;
 	}
 	else downcnt = 0;
 	
 	if(testred4 == 0)
 	{
-		if(upcnt>20) odometry = 200000.0;
+		if(upcnt>10) odometry = 200000.0;
 		else upcnt++;
 	}
 	else upcnt = 0;
@@ -334,7 +335,11 @@ void WorkStateFSM(void)
 		}break;
 		case DEFEND_STATE:  //????,??360???
 		{
-			if (find_enemy == 1) WorkState = ATTACK_STATE;
+			if (find_enemy == 1) 
+			{
+				WorkState = ATTACK_STATE;
+				odometryatt = odometry;
+			}
 			
 			if (inputmode == STOP) 
 			{
@@ -453,7 +458,7 @@ void ControlPitch(void)
 	pitchRealAngle = -(GMPITCHRx.angle - pitchZeroAngle) * 360 / 8192.0;
 	NORMALIZE_ANGLE180(pitchRealAngle);
 
-	MINMAX(pitchAngleTarget, -20.0f, 60);
+	MINMAX(pitchAngleTarget, -20.0f, 45);
 				
 	pitchIntensity = -ProcessPitchPID(pitchAngleTarget,pitchRealAngle,-MPU6050_Real_Data.Gyro_X);
 }
@@ -474,7 +479,7 @@ uint8_t up_dir = 0;
 
 void Defend_Action()
 {
-	if(pitchAngleTarget > 58.0)
+	if(pitchAngleTarget > 43.0)
 	{
 		pitch_dir = 0;
 	}
@@ -512,11 +517,28 @@ void Defend_Action()
 	bullet_ref = 0;
 }
 uint8_t catchedcnt =  0 ;
+uint8_t up_diratt = 0;
 void Attack_Action()
 {
-	//if(odometry < odometry_downmax2) ChassisSpeedRef.forward_back_ref = odometry_speed2;
-	//if(odometry > odometry_upmax2) ChassisSpeedRef.forward_back_ref = -odometry_speed2;
-	ChassisSpeedRef.forward_back_ref = 0.0;
+	if(shooterHeat0 > 4000) 
+	{
+		if(odometry < (odometryatt + odometry_downmax2) || odometry < odometry_downmax1) up_diratt = 0;
+		if(odometry > (odometryatt + odometry_upmax2) || odometry > odometry_upmax1) up_diratt = 1;
+		
+		if(up_diratt == 0) 
+		{
+			//if (ChassisSpeedRef.forward_back_ref < odometry_speed2) ChassisSpeedRef.forward_back_ref += 0.4;
+			//else 
+			ChassisSpeedRef.forward_back_ref = odometry_speed2;
+		}
+		else if(up_diratt == 1) 
+		{
+			//if (ChassisSpeedRef.forward_back_ref > -odometry_speed2) ChassisSpeedRef.forward_back_ref -= 0.4;
+			//else 
+			ChassisSpeedRef.forward_back_ref = -odometry_speed2;
+		}
+	}
+	else if (shooterHeat0 < 500) ChassisSpeedRef.forward_back_ref = 0.0;
 		
 	static float enemy_yaw_err_last = 0;
 	enemy_yaw_err = (float)((int16_t)YAW_OFFSET - enemy_yaw);
@@ -536,11 +558,14 @@ void Attack_Action()
 	pitchAngleTarget -= enemy_pitch_out;
 	enemy_pitch_err_last = enemy_pitch_err;
 		
-	if(enemy_yaw_err<60 && enemy_yaw_err>-60 && enemy_pitch_err<40 && enemy_pitch_err>-40 && pitchAngleTarget<50) 
+	if(enemy_yaw_err<50 && enemy_yaw_err>-50 && enemy_pitch_err<30 && enemy_pitch_err>-30)// && pitchAngleTarget<45) 
 	{
-		if (catchedcnt < 101) catchedcnt++;
-		if (catchedcnt > 100) bullet_ref = 800;
-		else bullet_ref = 0;
+		if (catchedcnt < 81) catchedcnt++;
+		if (catchedcnt > 80)
+		{
+			if(shooterHeat0 < 500) bullet_ref = 1200;
+		}
+		//else bullet_ref = 0;
 	}
 	else 
 	{
@@ -592,7 +617,7 @@ void controlLoop()
 		ControlCMFL();
 		ControlCMFR();
 		
-		if(shooterHeat0 > 3500) bullet_ref = 0;
+		if(shooterHeat0 > 4000) bullet_ref = 0;
 		ControlBullet();
 		
 		if(WorkState == STOP_STATE)
