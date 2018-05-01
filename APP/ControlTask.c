@@ -70,9 +70,14 @@ uint8_t find_enemy = 0;
 uint8_t on_enemy = 0;
 uint16_t enemy_yaw = YAW_OFFSET;
 uint16_t enemy_pitch = PITCH_OFFSET;
-uint16_t enemy_detect_cnt = 0;
+uint16_t manifold_fine_cnt = 0;
 WorkState_e WorkState = START_STATE;
 uint16_t prepare_time = 0;
+
+uint8_t bulletshooted = 0;
+uint16_t bulletshootedcnt = 0;
+uint8_t nobullet = 0;
+uint8_t bulletSpeedBuf_last[4] = {0};
 
 PID_Regulator_t CMRotatePID = CHASSIS_MOTOR_ROTATE_PID_DEFAULT; 
 PID_Regulator_t CM1SpeedPID = CHASSIS_MOTOR_SPEED_PID_DEFAULT;
@@ -276,6 +281,7 @@ void odometryLoop()
 
 extern FrictionWheelState_e FrictionWheelState;
 extern Shoot_State_e ShootState;
+unsigned int enemy_lost = 0;
 //?????
 void WorkStateFSM(void)
 {
@@ -335,7 +341,7 @@ void WorkStateFSM(void)
 		}break;
 		case DEFEND_STATE:  //????,??360???
 		{
-			if (find_enemy == 1) 
+			if (find_enemy == 1 && nobullet == 0) 
 			{
 				WorkState = ATTACK_STATE;
 				odometryatt = odometry;
@@ -354,6 +360,8 @@ void WorkStateFSM(void)
 				frictionRamp.ResetCounter(&frictionRamp);
 				FrictionWheelState = FRICTION_WHEEL_OFF;
 				WorkState = NORMAL_STATE;
+				bulletshootedcnt = 0;
+				nobullet = 0;
 			}
 			if (blink_cnt == 1000) 
 			{
@@ -363,7 +371,7 @@ void WorkStateFSM(void)
 		}break;
 		case ATTACK_STATE:  //??????
 		{
-			if(enemy_detect_cnt>1000)    //2s??????????????
+			if(manifold_fine_cnt>1000)    //2s??????????????
 			{
 				WorkState = DEFEND_STATE;
 				enemy_yaw = YAW_OFFSET;
@@ -371,14 +379,13 @@ void WorkStateFSM(void)
 			}
 			else
 			{
-				enemy_detect_cnt++;
+				manifold_fine_cnt++;
 			}
 			
-			static int enemy_lost = 0;
 			if (find_enemy == 0) 
 			{
 				enemy_lost++;
-				if (enemy_lost > 1000) 
+				if (enemy_lost > 2000) 
 				{
 					WorkState = DEFEND_STATE;
 					enemy_yaw = YAW_OFFSET;
@@ -560,12 +567,11 @@ void Attack_Action()
 		
 	if(enemy_yaw_err<50 && enemy_yaw_err>-50 && enemy_pitch_err<30 && enemy_pitch_err>-30)// && pitchAngleTarget<45) 
 	{
-		if (catchedcnt < 81) catchedcnt++;
 		if (catchedcnt > 80)
 		{
 			if(shooterHeat0 < 500) bullet_ref = 1200;
 		}
-		//else bullet_ref = 0;
+		else catchedcnt++;
 	}
 	else 
 	{
@@ -573,9 +579,6 @@ void Attack_Action()
 		bullet_ref = 0;
 	}
 }
-
-uint16_t bulletshooted = 0;
-uint8_t bulletSpeedBuf_last[4] = {0};
 
 void controlLoop()
 {
@@ -587,8 +590,11 @@ void controlLoop()
 		
 		if(bulletSpeedBuf[0] != bulletSpeedBuf_last[0] || bulletSpeedBuf[1] != bulletSpeedBuf_last[1] || bulletSpeedBuf[2] != bulletSpeedBuf_last[2] || bulletSpeedBuf[3] != bulletSpeedBuf_last[3])
 		{
-			bulletshooted++;
+			bulletshooted = 1;
+			bulletshootedcnt = 0;
+			nobullet = 0;
 		}
+		else bulletshooted = 0;
 		bulletSpeedBuf_last[0] = bulletSpeedBuf[0];
 		bulletSpeedBuf_last[1] = bulletSpeedBuf[1];
 		bulletSpeedBuf_last[2] = bulletSpeedBuf[2];
@@ -619,6 +625,12 @@ void controlLoop()
 		
 		if(shooterHeat0 > 4000) bullet_ref = 0;
 		ControlBullet();
+		
+		if (bullet_ref > 100) 
+		{
+			if(bulletshootedcnt < 5000) bulletshootedcnt++;
+			else nobullet = 1;
+		}
 		
 		if(WorkState == STOP_STATE)
 		{

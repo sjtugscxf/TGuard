@@ -156,7 +156,7 @@ extern WorkState_e WorkState;
 extern uint8_t find_enemy;
 extern uint16_t enemy_pitch;
 extern uint16_t enemy_yaw;
-extern uint16_t enemy_detect_cnt;
+extern uint16_t manifold_fine_cnt;
 
 extern int16_t yawIntensity ;
 
