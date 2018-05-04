@@ -68,6 +68,7 @@ float auto_attack_yaw_kd = 0.0;
 float auto_attack_pitch_kd = 0.0;
 uint8_t find_enemy = 0;
 uint8_t on_enemy = 0;
+uint8_t target_hero = 0;
 uint16_t enemy_yaw = YAW_OFFSET;
 uint16_t enemy_pitch = PITCH_OFFSET;
 uint16_t manifold_fine_cnt = 0;
@@ -254,21 +255,21 @@ void odometryLoop()
 	
 	if(testred1 == 0)
 	{
-		if(calicnt>4) odometry = 0.0;
+		if(calicnt>3) odometry = 0.0;
 		else calicnt++;
 	}
 	else calicnt = 0;
 	
 	if(testred2 == 0)
 	{
-		if(downcnt>10) odometry = -200000.0;
+		if(downcnt>3) odometry = -500000.0;
 		else downcnt++;
 	}
 	else downcnt = 0;
 	
 	if(testred4 == 0)
 	{
-		if(upcnt>10) odometry = 200000.0;
+		if(upcnt>3) odometry = 500000.0;
 		else upcnt++;
 	}
 	else upcnt = 0;
@@ -385,7 +386,7 @@ void WorkStateFSM(void)
 			if (find_enemy == 0) 
 			{
 				enemy_lost++;
-				if (enemy_lost > 2000) 
+				if (enemy_lost > 1200) 
 				{
 					WorkState = DEFEND_STATE;
 					enemy_yaw = YAW_OFFSET;
@@ -465,7 +466,7 @@ void ControlPitch(void)
 	pitchRealAngle = -(GMPITCHRx.angle - pitchZeroAngle) * 360 / 8192.0;
 	NORMALIZE_ANGLE180(pitchRealAngle);
 
-	MINMAX(pitchAngleTarget, -20.0f, 45);
+	MINMAX(pitchAngleTarget, -20.0f, 65);
 				
 	pitchIntensity = -ProcessPitchPID(pitchAngleTarget,pitchRealAngle,-MPU6050_Real_Data.Gyro_X);
 }
@@ -486,7 +487,7 @@ uint8_t up_dir = 0;
 
 void Defend_Action()
 {
-	if(pitchAngleTarget > 43.0)
+	if(pitchAngleTarget > 63.0)
 	{
 		pitch_dir = 0;
 	}
@@ -512,12 +513,20 @@ void Defend_Action()
 	
 	if(up_dir == 0) 
 	{
-		if (ChassisSpeedRef.forward_back_ref < odometry_speed1) ChassisSpeedRef.forward_back_ref += 0.4;
+		if (ChassisSpeedRef.forward_back_ref < odometry_speed1) 
+		{
+			if(odometry < -400000) ChassisSpeedRef.forward_back_ref += 10;
+			else ChassisSpeedRef.forward_back_ref += 0.4;
+		}
 		else ChassisSpeedRef.forward_back_ref = odometry_speed1;
 	}
 	else if(up_dir == 1) 
 	{
-		if (ChassisSpeedRef.forward_back_ref > -odometry_speed1) ChassisSpeedRef.forward_back_ref -= 0.4;
+		if (ChassisSpeedRef.forward_back_ref > -odometry_speed1)
+		{
+			if(odometry > 400000) ChassisSpeedRef.forward_back_ref -= 10;
+			else ChassisSpeedRef.forward_back_ref -= 0.4;
+		}
 		else ChassisSpeedRef.forward_back_ref = -odometry_speed1;
 	}
 	
@@ -525,8 +534,12 @@ void Defend_Action()
 }
 uint8_t catchedcnt =  0 ;
 uint8_t up_diratt = 0;
+float pitchAngleTargetMax = 65.2;
 void Attack_Action()
 {
+	if(odometry < (odometryatt + odometry_downmax2) || odometry < odometry_downmax1) ChassisSpeedRef.forward_back_ref = odometry_speed2;
+	if(odometry > (odometryatt + odometry_upmax2) || odometry > odometry_upmax1) ChassisSpeedRef.forward_back_ref = -odometry_speed2;
+	
 	if(shooterHeat0 > 4000) 
 	{
 		if(odometry < (odometryatt + odometry_downmax2) || odometry < odometry_downmax1) up_diratt = 0;
@@ -564,8 +577,14 @@ void Attack_Action()
 	else if (enemy_pitch_out<-1) enemy_pitch_out = -1;
 	pitchAngleTarget -= enemy_pitch_out;
 	enemy_pitch_err_last = enemy_pitch_err;
+//	if(target_hero == 0) 
+//	{
+//		// if (pitchAngleTarget > 45) pitchAngleTarget = 45;
+//		pitchAngleTargetMax = 45.2;
+//	}
+//	else pitchAngleTargetMax = 65.2;
 		
-	if(enemy_yaw_err<50 && enemy_yaw_err>-50 && enemy_pitch_err<30 && enemy_pitch_err>-30)// && pitchAngleTarget<45) 
+	if(enemy_yaw_err<50 && enemy_yaw_err>-50 && enemy_pitch_err<30 && enemy_pitch_err>-30 )//&& pitchAngleTarget < pitchAngleTargetMax) 
 	{
 		if (catchedcnt > 80)
 		{
