@@ -63,7 +63,7 @@ int16_t PID_PROCESS_Speed(fw_PID_Regulator_t pid_speed,float target, float veloc
 }
 
 float auto_attack_yaw_kp = 1.5;
-float auto_attack_pitch_kp = 0.001;
+float auto_attack_pitch_kp = 0.0007;
 float auto_attack_yaw_kd = 0.0;
 float auto_attack_pitch_kd = 0.0;
 uint8_t find_enemy = 0;
@@ -372,6 +372,8 @@ void WorkStateFSM(void)
 		}break;
 		case ATTACK_STATE:  //??????
 		{
+			if (nobullet == 1)  WorkState = DEFEND_STATE;
+			
 			if(manifold_fine_cnt>1000)    //2s??????????????
 			{
 				WorkState = DEFEND_STATE;
@@ -540,7 +542,7 @@ void Attack_Action()
 	if(odometry < (odometryatt + odometry_downmax2) || odometry < odometry_downmax1) ChassisSpeedRef.forward_back_ref = odometry_speed2;
 	if(odometry > (odometryatt + odometry_upmax2) || odometry > odometry_upmax1) ChassisSpeedRef.forward_back_ref = -odometry_speed2;
 	
-	if(shooterHeat0 > 4000) 
+	if(shooterHeat0 > 300) 
 	{
 		if(odometry < (odometryatt + odometry_downmax2) || odometry < odometry_downmax1) up_diratt = 0;
 		if(odometry > (odometryatt + odometry_upmax2) || odometry > odometry_upmax1) up_diratt = 1;
@@ -558,7 +560,7 @@ void Attack_Action()
 			ChassisSpeedRef.forward_back_ref = -odometry_speed2;
 		}
 	}
-	else if (shooterHeat0 < 500) ChassisSpeedRef.forward_back_ref = 0.0;
+	else if (shooterHeat0 < 150) ChassisSpeedRef.forward_back_ref = 0.0;
 		
 	static float enemy_yaw_err_last = 0;
 	enemy_yaw_err = (float)((int16_t)YAW_OFFSET - enemy_yaw);
@@ -588,7 +590,7 @@ void Attack_Action()
 	{
 		if (catchedcnt > 80)
 		{
-			if(shooterHeat0 < 500) bullet_ref = 1200;
+			if(shooterHeat0 < 100) bullet_ref = 1200; //bullet_ref = 400; 没有碰撞开关的时候
 		}
 		else catchedcnt++;
 	}
@@ -642,12 +644,12 @@ void controlLoop()
 		ControlCMFL();
 		ControlCMFR();
 		
-		if(shooterHeat0 > 4000) bullet_ref = 0;
+		if(shooterHeat0 > 300) bullet_ref = 0;
 		ControlBullet();
 		
 		if (bullet_ref > 100) 
 		{
-			if(bulletshootedcnt < 5000) bulletshootedcnt++;
+			if(bulletshootedcnt < 10000) bulletshootedcnt++;
 			else nobullet = 1;
 		}
 		
