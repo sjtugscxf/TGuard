@@ -309,7 +309,7 @@ void WorkStateFSM(void)
 				GREEN_LED_OFF();
 				RED_LED_OFF();
 				blink_cnt = 0;
-				printf("START\n");
+				//printf("START\n");
 			}
 			
 			if (inputmode == STOP) WorkState = STOP_STATE;
@@ -374,7 +374,7 @@ void WorkStateFSM(void)
 		{
 			if (nobullet == 1)  WorkState = DEFEND_STATE;
 			
-			if(manifold_fine_cnt>1000)    //2s??????????????
+			if(manifold_fine_cnt>500)    //2s??????????????
 			{
 				WorkState = DEFEND_STATE;
 				enemy_yaw = YAW_OFFSET;
@@ -579,14 +579,14 @@ void Attack_Action()
 	else if (enemy_pitch_out<-1) enemy_pitch_out = -1;
 	pitchAngleTarget -= enemy_pitch_out;
 	enemy_pitch_err_last = enemy_pitch_err;
-//	if(target_hero == 0) 
-//	{
-//		// if (pitchAngleTarget > 45) pitchAngleTarget = 45;
-//		pitchAngleTargetMax = 45.2;
-//	}
-//	else pitchAngleTargetMax = 65.2;
+	if(target_hero == 0) 
+	{
+		if (pitchAngleTarget > 45) pitchAngleTarget = 45;
+		pitchAngleTargetMax = 45.1;
+	}
+	else pitchAngleTargetMax = 65.1;
 		
-	if(enemy_yaw_err<50 && enemy_yaw_err>-50 && enemy_pitch_err<30 && enemy_pitch_err>-30 )//&& pitchAngleTarget < pitchAngleTargetMax) 
+	if(enemy_yaw_err<50 && enemy_yaw_err>-50 && enemy_pitch_err<30 && enemy_pitch_err>-30 && pitchAngleTarget < pitchAngleTargetMax) 
 	{
 		if (catchedcnt > 80)
 		{
@@ -621,15 +621,8 @@ void controlLoop()
 		bulletSpeedBuf_last[2] = bulletSpeedBuf[2];
 		bulletSpeedBuf_last[3] = bulletSpeedBuf[3];
 		
-		if(WorkState == DEFEND_STATE)
-		{
-			Defend_Action();
-		}
-		
-		if(WorkState == ATTACK_STATE)
-		{
-			Attack_Action();
-		}
+		if(WorkState == DEFEND_STATE) Defend_Action();
+		else if(WorkState == ATTACK_STATE) Attack_Action();
 		
 		ControlYawSpeed();
 		ControlPitch();

@@ -132,14 +132,14 @@ void USART3_IRQHandler(void)
 							if(auto_buffer[3]==0xA6)
 							{
 								find_enemy = 1;
-//								target_hero = 0;
-//								enemy_yaw = (0x0000 | auto_buffer[2]) | (auto_buffer[1]<<8);
-//								enemy_pitch = (0x0000 | auto_buffer[5]) | (auto_buffer[4]<<8);
-//							}
-//							else if(auto_buffer[3]==0xA8)
-//							{
-//								find_enemy = 1;
-//								target_hero = 1;
+								target_hero = 0;
+								enemy_yaw = (0x0000 | auto_buffer[2]) | (auto_buffer[1]<<8);
+								enemy_pitch = (0x0000 | auto_buffer[5]) | (auto_buffer[4]<<8);
+							}
+							else if(auto_buffer[3]==0xA8)
+							{
+								find_enemy = 1;
+								target_hero = 1;
 								enemy_yaw = (0x0000 | auto_buffer[2]) | (auto_buffer[1]<<8);
 								enemy_pitch = (0x0000 | auto_buffer[5]) | (auto_buffer[4]<<8);
 							}

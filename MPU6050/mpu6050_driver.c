@@ -23,54 +23,54 @@ int MPU6050_Init(void)
     {
         if(temp_data != MPU6050_ID)
         {
-            printf("error 1A\r\n");
+//            printf("error 1A\r\n");
             return 0xff; //校验失败，返回0xff
         }
     }
     else
     {
-        printf("error 1B\r\n");
+//        printf("error 1B\r\n");
         return 0xff; //读取失败 返回0xff
     }
     
     if(IIC_WriteData(MPU6050_DEVICE_ADDRESS,PWR_MGMT_1,0x01) == 0xff)    //解除休眠状态
     {
-        printf("error 1C\r\n");
+//        printf("error 1C\r\n");
         return 0xff;
     }
 		
 
     if(IIC_WriteData(MPU6050_DEVICE_ADDRESS,CONFIG,0x03) == 0xff)         //Digital Low-Pass Filter:DLPF_CFG is 3, Fs is 1khz 
     {                                                                     //acc bandwidth 44Hz,gyro 42Hz
-        printf("error 1E\r\n");
+//        printf("error 1E\r\n");
         return 0xff;
     }
     if(IIC_WriteData(MPU6050_DEVICE_ADDRESS,GYRO_CONFIG,0x10) == 0xff)    //FS_SEL 3 : gyroscope full scale range is +-1000degs/s 
     {
-        printf("error 1F\r\n");
+//        printf("error 1F\r\n");
         return 0xff;
     }
     if(IIC_WriteData(MPU6050_DEVICE_ADDRESS,ACCEL_CONFIG,0x00) == 0xff)   //AFS_SEL 1: accelerometer full scale range is +-2g
     {
-        printf("error 1G\r\n");
+//        printf("error 1G\r\n");
         return 0xff;
     }
     if(IIC_WriteData(MPU6050_DEVICE_ADDRESS,INT_PIN_CFG,0x02) == 0xff)    //logic level for the INT pin is active high
                                                                           //the INT pin emits a 50us long pulse, not latched    bypass mode enabled
     {
-        printf("error 1H\r\n");
+//        printf("error 1H\r\n");
         return 0xff;
     }
     if(IIC_WriteData(MPU6050_DEVICE_ADDRESS,INT_ENABLE,0x00) == 0xff)      //disable data ready interrupt
     {
-        printf("error 1I\r\n");
+//        printf("error 1I\r\n");
         return 0xff;
     }
 		
 		//设置mpu6050 IIC masters mode  disabled 不让mpu6050控制aux IIC接口
 		if(IIC_WriteData(MPU6050_DEVICE_ADDRESS,MPU6050_RA_USER_CTRL,0x00) == 0xff)      //disable data ready interrupt
     {
-        printf("error 1I\r\n");
+//        printf("error 1I\r\n");
         return 0xff;
     }
 		
@@ -81,7 +81,7 @@ int MPU6050_Init(void)
 //		//5883初始化
 		if(HMC5883_Init() == 0xff)
 		{
-			  printf("error 1K\r\n");
+//			  printf("error 1K\r\n");
         return 0xff;
 		}
 		
@@ -94,18 +94,18 @@ int MPU6050_EnableInt(void)
 {
 	  if(IIC_WriteData(MPU6050_DEVICE_ADDRESS,SMPLRT_DIV,0x01)==0xff)      //Sample Rate: Gyro output rate / (1 + 1) = 500Hz
 	  {
-        printf("Cannot enable interrupt successfully.\r\n");
+//        printf("Cannot enable interrupt successfully.\r\n");
         return 0xff;
 	  }
-    printf("MPU6050 set sample rate done.\n");
+//    printf("MPU6050 set sample rate done.\n");
 	  Delay_ms(10);
 	  if(IIC_WriteData(MPU6050_DEVICE_ADDRESS,INT_ENABLE,0x01) == 0xff)     //enable data ready interrupt 
     {
-      printf("error 1I\r\n");
+//      printf("error 1I\r\n");
       return 0xff;
     } 
 #if 0
-    printf("MPU6050 enable interrupt done.\n"); 
+//    printf("MPU6050 enable interrupt done.\n"); 
 //	unsigned char  buf[14] ={0};    
 //    Delay_ms(2);
 //	IIC_ReadData(MPU6050_DEVICE_ADDRESS,MPU6050_DATA_START,buf,14);    //dummy read to clear the data registers
@@ -131,7 +131,7 @@ int MPU6050_ReadData(uint8_t Slave_Addr, uint8_t Reg_Addr, uint8_t * Data, uint8
 	//IIC_ReadData(MPU6050_DEVICE_ADDRESS,MPU6050_DATA_START,buf,14)
     if(IIC_ReadData(Slave_Addr,Reg_Addr,Data,Num) == 0xff)
     {
-        printf("error 1J\r\n");
+//        printf("error 1J\r\n");
         return 0xff;
     }
    
@@ -260,13 +260,13 @@ uint8_t HMC5883_Init(void)
     {
         if(tmp_ch != HMC5883_DEVICE_ID_A)
         {
-            printf("error 2A\r\n");
+            //printf("error 2A\r\n");
             return 0xff;
         }
     }
     else
     {
-        printf("error 2B\r\n");
+        //printf("error 2B\r\n");
         return 0xff;
     }
 
