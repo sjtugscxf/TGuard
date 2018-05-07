@@ -43,12 +43,31 @@ int16_t PID_PROCESS_Double(fw_PID_Regulator_t pid_position,fw_PID_Regulator_t pi
                             float target, float position_feedback, float velocity_feedback);
 int16_t PID_PROCESS_Speed(fw_PID_Regulator_t pid_speed,float target, float velocity_feedback);
 
-#define AUTO_ATTACK_YAW_KP      0.1f
-#define AUTO_ATTACK_YAW_KD      0 
-#define AUTO_ATTACK_PITCH_KP      0.0005f
-#define AUTO_ATTACK_PITCH_KD      0 
+#define AUTO_ATTACK_YAW_KP        1.5f
+#define AUTO_ATTACK_YAW_KD        0.0f 
+#define AUTO_ATTACK_PITCH_KP      0.0007f
+#define AUTO_ATTACK_PITCH_KD      0.0f 
 #define YAW_OFFSET         320u  
 #define PITCH_OFFSET       210u  
+
+#define ODOMETRY_FACT      0.01f 
+#define ODOMETRY_UPMAX1    180000.0f 
+#define ODOMETRY_DOWNMAX1  -180000.0f 
+#define ODOMETRY_SPEED1    400.0f 
+#define ODOMETRY_UPMAX2    70000.0f 
+#define ODOMETRY_DOWNMAX2  -70000.0f 
+#define ODOMETRY_SPEED2    200.0f 
+
+#define PITCHANGLETARGETMAX1    65.0f 
+#define PITCHANGLETARGETMAX2    45.0f 
+#define PITCHANGLETARGETMIN     -20.0f 
+
+#define YAW_DEFEND_SPEED       200.0f
+#define PITCH_DEFEND_SPEED       0.08f
+
+#define BULLET_SPEED       1200.0f  //bullet_ref = 400; 没有碰撞开关的时候
+#define STOPHEAT       300u
+
 #define CHASSIS_SPEED_ATTENUATION   (1.30f)
 #define CHASSIS_MOTOR_ROTATE_PID_DEFAULT \
 {\

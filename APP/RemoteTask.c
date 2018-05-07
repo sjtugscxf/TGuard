@@ -104,12 +104,8 @@ void RemoteControlProcess(Remote *rc)
 	if(WorkState == NORMAL_STATE)
 	{
 		ChassisSpeedRef.forward_back_ref = (rc->ch1 - (int16_t)REMOTE_CONTROLLER_STICK_OFFSET) * STICK_TO_CHASSIS_SPEED_REF_FACT;
-		//ChassisSpeedRef.left_right_ref   = (rc->ch0 - (int16_t)REMOTE_CONTROLLER_STICK_OFFSET) * STICK_TO_CHASSIS_SPEED_REF_FACT; 
-		if(shooterHeat0 > 300) bullet_ref = 0;
+		if(shooterHeat0 > STOPHEAT) bullet_ref = 0;
 		else bullet_ref = (rc->ch0 - (int16_t)REMOTE_CONTROLLER_STICK_OFFSET) * STICK_TO_BULLET_SPEED_REF_FACT;
-		//bullet2_ref = (rc->ch0 - (int16_t)REMOTE_CONTROLLER_STICK_OFFSET) * STICK_TO_CHASSIS_SPEED_REF_FACT * 1.5;
-		//bullet_angle_target += (rc->ch1 - (int16_t)REMOTE_CONTROLLER_STICK_OFFSET) * STICK_TO_BULLET_POSITION_REF_FACT;
-		//bullet2_angle_target += (rc->ch0 - (int16_t)REMOTE_CONTROLLER_STICK_OFFSET) * STICK_TO_BULLET_POSITION_REF_FACT;
 		
 		pitchAngleTarget += (rc->ch3 - (int16_t)REMOTE_CONTROLLER_STICK_OFFSET) * STICK_TO_PITCH_ANGLE_INC_FACT;
 		yawSpeedTarget = (rc->ch2 - (int16_t)REMOTE_CONTROLLER_STICK_OFFSET) * STICK_TO_YAW_SPEED_INC_FACT;
@@ -117,19 +113,18 @@ void RemoteControlProcess(Remote *rc)
 	RemoteShootControl(&g_switch1, rc->s1);
 }
 
-//???????
-void RemoteControlProcessAuto(Remote *rc)
-{
-	if(WorkState == DEFEND_STATE || WorkState == ATTACK_STATE)
-	{
-		//if(shooterHeat0 > 300) bullet_ref = 0;
-		//else bullet_ref = (rc->ch0 - (int16_t)REMOTE_CONTROLLER_STICK_OFFSET) * STICK_TO_CHASSIS_SPEED_REF_FACT * 0.2;
-		//bullet2_ref = (rc->ch0 - (int16_t)REMOTE_CONTROLLER_STICK_OFFSET) * STICK_TO_CHASSIS_SPEED_REF_FACT * 1.5;
-		//bullet_angle_target += (rc->ch1 - (int16_t)REMOTE_CONTROLLER_STICK_OFFSET) * STICK_TO_BULLET_POSITION_REF_FACT;
-		//bullet2_angle_target += (rc->ch0 - (int16_t)REMOTE_CONTROLLER_STICK_OFFSET) * STICK_TO_BULLET_POSITION_REF_FACT;
-	}
-	//RemoteShootControl(&g_switch1, rc->s1);
-}
+//void RemoteControlProcessAuto(Remote *rc)
+//{
+//	if(WorkState == DEFEND_STATE || WorkState == ATTACK_STATE)
+//	{
+//		//if(shooterHeat0 > STOPHEAT) bullet_ref = 0;
+//		//else bullet_ref = (rc->ch0 - (int16_t)REMOTE_CONTROLLER_STICK_OFFSET) * STICK_TO_CHASSIS_SPEED_REF_FACT * 0.2;
+//		//bullet2_ref = (rc->ch0 - (int16_t)REMOTE_CONTROLLER_STICK_OFFSET) * STICK_TO_CHASSIS_SPEED_REF_FACT * 1.5;
+//		//bullet_angle_target += (rc->ch1 - (int16_t)REMOTE_CONTROLLER_STICK_OFFSET) * STICK_TO_BULLET_POSITION_REF_FACT;
+//		//bullet2_angle_target += (rc->ch0 - (int16_t)REMOTE_CONTROLLER_STICK_OFFSET) * STICK_TO_BULLET_POSITION_REF_FACT;
+//	}
+//	//RemoteShootControl(&g_switch1, rc->s1);
+//}
 
 /*??????*/   
 void GetRemoteSwitchAction(RemoteSwitch_t *sw, uint8_t val)
