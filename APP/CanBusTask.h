@@ -38,6 +38,7 @@ void Set_Gimbal_Current(CAN_TypeDef *CANx, int16_t gimbal_pitch_iq, int16_t gimb
 void Set_CM_Speed(CAN_TypeDef *CANx, int16_t cm1_iq, int16_t cm2_iq, int16_t cm3_iq, int16_t cm4_iq);
 
 extern uint8_t redBuf;
+extern uint8_t gameProgress;
 extern uint8_t bulletFreq;
 extern uint16_t shooterHeat0;
 extern float bulletSpeed;

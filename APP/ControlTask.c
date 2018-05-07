@@ -216,12 +216,17 @@ void WorkStateFSM(void)
 			}
 			else if (inputmode == AUTO)
 			{
-				//SetFrictionWheelSpeed(1000 + (FRICTION_WHEEL_MAX_DUTY-1000)*frictionRamp.Calc(&frictionRamp)); 
-				//if(frictionRamp.IsOverflow(&frictionRamp))
-				//{
 				WorkState = DEFEND_STATE;
-				//	FrictionWheelState = FRICTION_WHEEL_ON;
-				//}
+			}
+			
+			if(gameProgress == 4)
+			{
+				SetFrictionWheelSpeed(1000 + (FRICTION_WHEEL_MAX_DUTY-1000)*frictionRamp.Calc(&frictionRamp)); 
+				if(frictionRamp.IsOverflow(&frictionRamp))
+				{
+					WorkState = DEFEND_STATE;
+					FrictionWheelState = FRICTION_WHEEL_ON;
+				}
 			}
 			
 			if (blink_cnt == 1000) 
@@ -244,16 +249,10 @@ void WorkStateFSM(void)
 				SetFrictionWheelSpeed(1000); 
 				FrictionWheelState = FRICTION_WHEEL_OFF;
 				frictionRamp.ResetCounter(&frictionRamp);
-			}
-			else if (inputmode == REMOTE_INPUT)
-			{
-				SetFrictionWheelSpeed(1000); 
-				frictionRamp.ResetCounter(&frictionRamp);
-				FrictionWheelState = FRICTION_WHEEL_OFF;
-				WorkState = NORMAL_STATE;
 				bulletshootedcnt = 0;
 				nobullet = 0;
 			}
+
 			if (blink_cnt == 1000) 
 			{
 				blink_cnt = 0;
@@ -290,14 +289,10 @@ void WorkStateFSM(void)
 				SetFrictionWheelSpeed(1000); 
 				frictionRamp.ResetCounter(&frictionRamp);
 				FrictionWheelState = FRICTION_WHEEL_OFF;
+				bulletshootedcnt = 0;
+				nobullet = 0;
 			}
-			else if (inputmode == REMOTE_INPUT)
-			{
-				SetFrictionWheelSpeed(1000); 
-				frictionRamp.ResetCounter(&frictionRamp);
-				FrictionWheelState = FRICTION_WHEEL_OFF;
-				WorkState = NORMAL_STATE;
-			}
+
 			if (blink_cnt == 1000) 
 			{
 				blink_cnt = 0;

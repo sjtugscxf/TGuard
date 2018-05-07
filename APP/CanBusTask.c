@@ -8,6 +8,7 @@ Motor6623RxMsg_t GMPITCHRx,GMYAWRx;
 
 static uint32_t can_count = 0;
 uint8_t redBuf = 0;
+uint8_t gameProgress = 0;
 uint8_t bulletFreq = 0;
 uint16_t shooterHeat0 = 0;
 float bulletSpeed = 0;
@@ -42,7 +43,8 @@ void CanReceiveMsgProcess(CanRxMsg * msg)
 				GMPITCHRx.angle = ((uint16_t)msg->Data[0]<<8)|(uint16_t)msg->Data[1];
 				break;
 			case UPMSG_RXID:
-				redBuf = msg->Data[0];
+				redBuf = msg->Data[0] & 0x0F;
+				gameProgress = (msg->Data[0]>>4)& 0x0F;
 				bulletFreq = msg->Data[1];
 				shooterHeat0 = (0x0000 | msg->Data[2]) | (msg->Data[3]<<8);
 				unsigned char * b = NULL;
