@@ -47,8 +47,8 @@ int16_t PID_PROCESS_Speed(fw_PID_Regulator_t pid_speed,float target, float veloc
 #define AUTO_ATTACK_YAW_KD        0.0f 
 #define AUTO_ATTACK_PITCH_KP      0.0007f
 #define AUTO_ATTACK_PITCH_KD      0.0f 
-#define YAW_OFFSET         320u  
-#define PITCH_OFFSET       210u  
+//#define YAW_OFFSET         320u  
+//#define PITCH_OFFSET       210u  
 
 #define ODOMETRY_FACT      0.01f 
 #define ODOMETRY_UPMAX1    180000.0f 
@@ -57,10 +57,12 @@ int16_t PID_PROCESS_Speed(fw_PID_Regulator_t pid_speed,float target, float veloc
 #define ODOMETRY_UPMAX2    70000.0f 
 #define ODOMETRY_DOWNMAX2  -70000.0f 
 #define ODOMETRY_SPEED2    200.0f 
+#define ODOMETRY_SPEED3    40.0f 
 
 #define PITCHANGLETARGETMAX1    65.0f 
-#define PITCHANGLETARGETMAX2    45.0f 
-#define PITCHANGLETARGETMIN     -20.0f 
+#define PITCHANGLETARGETMAX2    65.0f 
+#define PITCHANGLETARGETMIN1     0.0f 
+#define PITCHANGLETARGETMIN2     20.0f 
 
 #define YAW_DEFEND_SPEED       200.0f
 #define PITCH_DEFEND_SPEED       0.08f
