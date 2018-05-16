@@ -62,7 +62,7 @@ int16_t PID_PROCESS_Speed(fw_PID_Regulator_t pid_speed,float target, float veloc
 #define PITCHANGLETARGETMAX1    65.0f 
 #define PITCHANGLETARGETMAX2    65.0f 
 #define PITCHANGLETARGETMIN1     0.0f 
-#define PITCHANGLETARGETMIN2     20.0f 
+#define PITCHANGLETARGETMIN2     0.0f 
 
 #define YAW_DEFEND_SPEED       200.0f
 #define PITCH_DEFEND_SPEED       0.08f

@@ -489,9 +489,9 @@ void Attack_Action()
 		if (pitchAngleTarget > PITCHANGLETARGETMAX2) pitchAngleTarget = PITCHANGLETARGETMAX2;
 	}
 		
-	if(enemy_yaw_err<50 && enemy_yaw_err>-50 && enemy_pitch_err<30 && enemy_pitch_err>-30) 
+	if(enemy_yaw_err<50 && enemy_yaw_err>-50 && enemy_pitch_err<50 && enemy_pitch_err>-50) 
 	{
-		if (catchedcnt > 80)
+		if (catchedcnt > 10)
 		{
 			if(shooterHeat0 < 100) bullet_ref = BULLET_SPEED; 
 		}
