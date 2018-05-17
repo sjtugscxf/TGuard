@@ -515,10 +515,10 @@ void controlLoop()
 	if(target_hero == 0) 
 	{
 		if(pitchAngleTarget < 22) pitch_offset = 210;
-		else if(pitchAngleTarget < 37) pitch_offset = 200;
-		else if(pitchAngleTarget < 50) pitch_offset = (unsigned int)(200 - (pitchAngleTarget - 37));
-		else if(pitchAngleTarget < 55) pitch_offset = (unsigned int)(187 - (pitchAngleTarget - 50)*3);
-		else if(pitchAngleTarget < (PITCHANGLETARGETMAX1 + 0.1)) pitch_offset = (unsigned int)(172 - (pitchAngleTarget - 55));
+		else if(pitchAngleTarget < 37) pitch_offset = 206;
+		else if(pitchAngleTarget < 50) pitch_offset = (unsigned int)(206 - (pitchAngleTarget - 37));
+		else if(pitchAngleTarget < 55) pitch_offset = (unsigned int)(193 - (pitchAngleTarget - 50));
+		else if(pitchAngleTarget < (PITCHANGLETARGETMAX1 + 0.1)) pitch_offset = (unsigned int)(188 - (pitchAngleTarget - 55));
 	}
 	else pitch_offset = 210;
 		
@@ -561,7 +561,7 @@ void controlLoop()
 		
 		if (bullet_ref > 100) 
 		{
-			if(bulletshootedcnt < 10000) bulletshootedcnt++;
+			if(bulletshootedcnt < 20000) bulletshootedcnt++;
 			else nobullet = 1;
 		}
 		
