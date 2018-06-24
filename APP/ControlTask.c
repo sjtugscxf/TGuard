@@ -178,6 +178,9 @@ extern FrictionWheelState_e FrictionWheelState;
 extern Shoot_State_e ShootState;
 unsigned int enemy_lost = 0;
 uint8_t enemy_far = 0;
+
+uint8_t pitch_dir = 0;
+uint8_t up_dir = 0;
 void WorkStateFSM(void)
 {
 	static int blink_cnt = 0;
@@ -281,10 +284,11 @@ void WorkStateFSM(void)
 			if (find_enemy == 0 || enemy_far == 1) 
 			{
 				enemy_lost++;
-				if (enemy_lost > 1200) 
+				if (enemy_lost > 2000) 
 				{
 					WorkState = DEFEND_STATE;
 					enemy_lost = 0;
+					pitch_dir= 0;
 				}
 			}
 			else enemy_lost = 0;
@@ -362,9 +366,6 @@ float enemy_yaw_out = 0;
 float enemy_pitch_err = 0;
 float enemy_pitch_out = 0;
 
-uint8_t pitch_dir = 0;
-uint8_t up_dir = 0;
-
 float pitchAngleTargetMin = 0;
 float yawSpeed = 200;
 void Defend_Action()
@@ -378,11 +379,11 @@ void Defend_Action()
 		pitchAngleTargetMin = PITCHANGLETARGETMIN1;
 	}
 	
-	if(pitchAngleTarget > (PITCHANGLETARGETMAX1 - 2.0))
+	if(pitchAngleTarget > (PITCHANGLETARGETMAX1 - 0.5))
 	{
 		pitch_dir = 0;
 	}
-	else if(pitchAngleTarget < (pitchAngleTargetMin + 2.0))
+	else if(pitchAngleTarget < (pitchAngleTargetMin + 0.5))
 	{
 		pitch_dir = 1;
 	}
@@ -489,7 +490,7 @@ void Attack_Action()
 		if (pitchAngleTarget > PITCHANGLETARGETMAX2) pitchAngleTarget = PITCHANGLETARGETMAX2;
 	}
 		
-	if(enemy_yaw_err<50 && enemy_yaw_err>-50 && enemy_pitch_err<50 && enemy_pitch_err>-50) 
+	if(enemy_yaw_err<50 && enemy_yaw_err>-50 && enemy_pitch_err<60 && enemy_pitch_err>-60) 
 	{
 		if (catchedcnt > 10)
 		{
@@ -514,11 +515,12 @@ void controlLoop()
 	
 	if(target_hero == 0) 
 	{
-		if(pitchAngleTarget < 22) pitch_offset = 210;
-		else if(pitchAngleTarget < 37) pitch_offset = 206;
-		else if(pitchAngleTarget < 50) pitch_offset = (unsigned int)(206 - (pitchAngleTarget - 37));
-		else if(pitchAngleTarget < 55) pitch_offset = (unsigned int)(193 - (pitchAngleTarget - 50));
-		else if(pitchAngleTarget < (PITCHANGLETARGETMAX1 + 0.1)) pitch_offset = (unsigned int)(188 - (pitchAngleTarget - 55));
+		if(pitchAngleTarget < 30) pitch_offset = 210;
+		else if(pitchAngleTarget < 40) pitch_offset = (unsigned int)(210 - (pitchAngleTarget - 30));
+		else if(pitchAngleTarget < 45) pitch_offset = (unsigned int)(200 - (pitchAngleTarget - 40)*2);
+		else if(pitchAngleTarget < 50) pitch_offset = (unsigned int)(188 - (pitchAngleTarget - 45));
+		else if(pitchAngleTarget < 55) pitch_offset = (unsigned int)(183 + (pitchAngleTarget - 50));
+		else if(pitchAngleTarget < (PITCHANGLETARGETMAX1 + 0.1)) pitch_offset = 188;
 	}
 	else pitch_offset = 210;
 		

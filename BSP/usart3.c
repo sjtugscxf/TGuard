@@ -143,7 +143,11 @@ void USART3_IRQHandler(void)
 								enemy_yaw = (0x0000 | auto_buffer[2]) | (auto_buffer[1]<<8);
 								enemy_pitch = (0x0000 | auto_buffer[5]) | (auto_buffer[4]<<8);
 							}
-							else if(auto_buffer[3]==0xA4 || auto_buffer[3]==0xA3) find_enemy = 0;
+							else if(auto_buffer[3]==0xA4 || auto_buffer[3]==0xA3) 
+							{
+								find_enemy = 0;
+								if(auto_buffer[3]==0xA3) enemy_lost = 2100;
+							}
 							manifold_fine_cnt = 0;
 						}
 						auto_receiving = 0;
