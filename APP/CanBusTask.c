@@ -3,7 +3,7 @@
 
 #define CanRxGetU16(canRxMsg, num) (((uint16_t)canRxMsg.Data[num * 2] << 8) | (uint16_t)canRxMsg.Data[num * 2 + 1])
 uint8_t isRcanStarted_CMGM = 0;
-Motor820RRxMsg_t CMFLRx,CMFRRx,BulletRx,Bullet2Rx;
+Motor820RRxMsg_t CMFLRx,CMFRRx,BulletRx,Bullet2Rx,FRICLRx,FRICRRx;
 Motor6623RxMsg_t GMPITCHRx,GMYAWRx;
 
 static uint32_t can_count = 0;
@@ -13,6 +13,25 @@ uint8_t bulletFreq = 0;
 uint16_t shooterHeat0 = 0;
 float bulletSpeed = 0;
 uint8_t bulletSpeedBuf[4] = {0};
+
+void FricCanReceiveMsgProcess(CanRxMsg * msg)
+{      
+		switch(msg->StdId)
+		{
+			case FRICL_RXID:
+				FRICLRx.angle = ((uint16_t)msg->Data[0]<<8)|(uint16_t)msg->Data[1];
+				FRICLRx.RotateSpeed = ((uint16_t)msg->Data[2]<<8)|(uint16_t)msg->Data[3];
+				break;
+			case FRICR_RXID:
+				FRICRRx.angle = ((uint16_t)msg->Data[0]<<8)|(uint16_t)msg->Data[1];
+				FRICRRx.RotateSpeed = ((uint16_t)msg->Data[2]<<8)|(uint16_t)msg->Data[3];
+				break;
+			
+				default:
+				{
+				}
+		}
+}
 
 void CanReceiveMsgProcess(CanRxMsg * msg)
 {      

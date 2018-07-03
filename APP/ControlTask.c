@@ -82,9 +82,20 @@ PID_Regulator_t CM2SpeedPID = CHASSIS_MOTOR_SPEED_PID_DEFAULT;
 PID_Regulator_t BulletSpeedPID = CHASSIS_MOTOR_SPEED_PID_DEFAULT;
 PID_Regulator_t Bullet2SpeedPID = CHASSIS_MOTOR_SPEED_PID_DEFAULT;
 
-int16_t CMFLIntensity = 0, CMFRIntensity = 0, BulletIntensity = 0,Bullet2Intensity = 0;
+float friclSpeedTarget = 0;
+float fricrSpeedTarget = 0;
+PID_Regulator_t FRICLSpeedPID = CHASSIS_MOTOR_SPEED_PID_DEFAULT;
+PID_Regulator_t FRICRSpeedPID = CHASSIS_MOTOR_SPEED_PID_DEFAULT;
+
+int16_t CMFLIntensity = 0, CMFRIntensity = 0, BulletIntensity = 0,Bullet2Intensity = 0, FRICLIntensity = 0, FRICRIntensity = 0;
 int16_t yawIntensity = 0;		
 int16_t pitchIntensity = 0;
+
+void SetFrictionWheelSpeed(float x)
+{
+	friclSpeedTarget = x;
+	fricrSpeedTarget = -x;
+}
 
 void CMControlInit(void)
 {
@@ -93,6 +104,8 @@ void CMControlInit(void)
 	CM2SpeedPID.Reset(&CM2SpeedPID);
 	BulletSpeedPID.Reset(&BulletSpeedPID);
 	Bullet2SpeedPID.Reset(&Bullet2SpeedPID);
+	FRICLSpeedPID.Reset(&FRICLSpeedPID);
+	FRICRSpeedPID.Reset(&FRICRSpeedPID);
 }
 
 void ControlCMFL(void)
@@ -128,6 +141,28 @@ void ControlBullet(void)
 
 	BulletSpeedPID.Calc(&BulletSpeedPID);
 	BulletIntensity = CHASSIS_SPEED_ATTENUATION * BulletSpeedPID.output;
+}
+
+void ControlFRICL(void)
+{		
+	FRICLSpeedPID.ref =  friclSpeedTarget*0.075;
+	FRICLSpeedPID.ref = 160 * FRICLSpeedPID.ref;	
+			
+	FRICLSpeedPID.fdb = FRICLRx.RotateSpeed;
+
+	FRICLSpeedPID.Calc(&FRICLSpeedPID);
+	FRICLIntensity = CHASSIS_SPEED_ATTENUATION * FRICLSpeedPID.output;
+}
+
+void ControlFRICR(void)
+{		
+	FRICRSpeedPID.ref =  fricrSpeedTarget*0.075;
+	FRICRSpeedPID.ref = 160 * FRICRSpeedPID.ref;	
+			
+	FRICRSpeedPID.fdb = FRICRRx.RotateSpeed;
+
+	FRICRSpeedPID.Calc(&FRICRSpeedPID);
+	FRICRIntensity = CHASSIS_SPEED_ATTENUATION * FRICRSpeedPID.output;
 }
 
 unsigned char testred1 = 0;
@@ -215,7 +250,7 @@ void WorkStateFSM(void)
 			if (inputmode == STOP) 
 			{
 				WorkState = STOP_STATE;
-				SetFrictionWheelSpeed(1000); 
+				SetFrictionWheelSpeed(0); 
 				frictionRamp.ResetCounter(&frictionRamp);
 				FrictionWheelState = FRICTION_WHEEL_OFF;
 			}
@@ -226,7 +261,7 @@ void WorkStateFSM(void)
 			
 			if(gameProgress == 4)
 			{
-				SetFrictionWheelSpeed(1000 + (FRICTION_WHEEL_MAX_DUTY-1000)*frictionRamp.Calc(&frictionRamp)); 
+				SetFrictionWheelSpeed(0 + (FRICTION_WHEEL_MAX_DUTY-0)*frictionRamp.Calc(&frictionRamp)); 
 				if(frictionRamp.IsOverflow(&frictionRamp))
 				{
 					WorkState = DEFEND_STATE;
@@ -251,7 +286,7 @@ void WorkStateFSM(void)
 			if (inputmode == STOP) 
 			{
 				WorkState = STOP_STATE;
-				SetFrictionWheelSpeed(1000); 
+				SetFrictionWheelSpeed(0); 
 				FrictionWheelState = FRICTION_WHEEL_OFF;
 				frictionRamp.ResetCounter(&frictionRamp);
 				bulletshootedcnt = 0;
@@ -296,7 +331,7 @@ void WorkStateFSM(void)
 			if (inputmode == STOP) 
 			{
 				WorkState = STOP_STATE;
-				SetFrictionWheelSpeed(1000); 
+				SetFrictionWheelSpeed(0); 
 				frictionRamp.ResetCounter(&frictionRamp);
 				FrictionWheelState = FRICTION_WHEEL_OFF;
 				bulletshootedcnt = 0;
@@ -331,6 +366,11 @@ void setCMMotor()
 void setGMMotor()
 {
 	Set_Gimbal_Current(CAN2, yawIntensity, pitchIntensity); 
+}
+
+void setFRICMotor()
+{
+	Set_CM_Speed(CAN1, FRICLIntensity, FRICRIntensity, 0, 0);		
 }
 
 #define NORMALIZE_ANGLE180(angle) angle = ((angle) > 180) ? ((angle) - 360) : (((angle) < -180) ? (angle) + 360 : angle)
@@ -575,5 +615,14 @@ void controlLoop()
 			Bullet2Intensity = 0;
 		}
 		setCMMotor();
+		
+		ControlFRICL();
+		ControlFRICR();
+		if(WorkState == STOP_STATE)
+		{
+			FRICLIntensity = 0;
+			FRICRIntensity = 0;
+		}
+		setFRICMotor();
 	}
 }

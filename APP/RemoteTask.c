@@ -31,13 +31,13 @@ void RemoteShootControl(RemoteSwitch_t *sw, uint8_t val)
 			if(sw->switch_value1 == REMOTE_SWITCH_CHANGE_3TO1)   
 			{
 				ShootState = NOSHOOTING;
-				SetFrictionWheelSpeed(1000);
+				SetFrictionWheelSpeed(0);
 				FrictionWheelState = FRICTION_WHEEL_OFF;
 				frictionRamp.ResetCounter(&frictionRamp);
 			}
 			else
 			{
-				SetFrictionWheelSpeed(1000 + (FRICTION_WHEEL_MAX_DUTY-1000)*frictionRamp.Calc(&frictionRamp)); 
+				SetFrictionWheelSpeed(0 + (FRICTION_WHEEL_MAX_DUTY-0)*frictionRamp.Calc(&frictionRamp)); 
 				if(frictionRamp.IsOverflow(&frictionRamp))
 				{
 					FrictionWheelState = FRICTION_WHEEL_ON; 	
@@ -50,7 +50,7 @@ void RemoteShootControl(RemoteSwitch_t *sw, uint8_t val)
 			if(sw->switch_value1 == REMOTE_SWITCH_CHANGE_3TO1)   
 			{
 				FrictionWheelState = FRICTION_WHEEL_OFF;				  
-				SetFrictionWheelSpeed(1000); 
+				SetFrictionWheelSpeed(0); 
 				frictionRamp.ResetCounter(&frictionRamp);
 				ShootState = NOSHOOTING;
 			}
@@ -104,8 +104,9 @@ void RemoteControlProcess(Remote *rc)
 	if(WorkState == NORMAL_STATE)
 	{
 		ChassisSpeedRef.forward_back_ref = (rc->ch1 - (int16_t)REMOTE_CONTROLLER_STICK_OFFSET) * STICK_TO_CHASSIS_SPEED_REF_FACT;
-		if(shooterHeat0 > STOPHEAT) bullet_ref = 0;
-		else bullet_ref = (rc->ch0 - (int16_t)REMOTE_CONTROLLER_STICK_OFFSET) * STICK_TO_BULLET_SPEED_REF_FACT;
+		//if(shooterHeat0 > STOPHEAT) bullet_ref = 0;
+		//else 
+		bullet_ref = (rc->ch0 - (int16_t)REMOTE_CONTROLLER_STICK_OFFSET) * STICK_TO_BULLET_SPEED_REF_FACT;
 		
 		pitchAngleTarget += (rc->ch3 - (int16_t)REMOTE_CONTROLLER_STICK_OFFSET) * STICK_TO_PITCH_ANGLE_INC_FACT;
 		yawSpeedTarget = (rc->ch2 - (int16_t)REMOTE_CONTROLLER_STICK_OFFSET) * STICK_TO_YAW_SPEED_INC_FACT;
