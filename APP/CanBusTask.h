@@ -9,8 +9,8 @@
 #define BULLET_RXID 0x203u
 #define BULLET2_RXID 0x204u
 
-#define GMYAW_RXID 0x206u
-#define GMPITCH_RXID 0x205u
+#define GMYAW_RXID 0x205u
+#define GMPITCH_RXID 0x206u
 
 #define UPMSG_RXID 0x305u
 

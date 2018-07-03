@@ -59,9 +59,9 @@ int16_t PID_PROCESS_Speed(fw_PID_Regulator_t pid_speed,float target, float veloc
 #define ODOMETRY_SPEED2    200.0f 
 #define ODOMETRY_SPEED3    40.0f 
 
-#define PITCHANGLETARGETMAX1    68.0f 
+#define PITCHANGLETARGETMAX1    20.0f 
 #define PITCHANGLETARGETMAX2    68.0f 
-#define PITCHANGLETARGETMIN1     0.0f 
+#define PITCHANGLETARGETMIN1    -25.0f 
 #define PITCHANGLETARGETMIN2     0.0f 
 
 #define YAW_DEFEND_SPEED       200.0f

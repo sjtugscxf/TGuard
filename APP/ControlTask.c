@@ -330,16 +330,16 @@ void setCMMotor()
 
 void setGMMotor()
 {
-	Set_Gimbal_Current(CAN2, pitchIntensity, yawIntensity); 
+	Set_Gimbal_Current(CAN2, yawIntensity, pitchIntensity); 
 }
 
 #define NORMALIZE_ANGLE180(angle) angle = ((angle) > 180) ? ((angle) - 360) : (((angle) < -180) ? (angle) + 360 : angle)
-fw_PID_Regulator_t pitchPositionPID = fw_PID_INIT(7.0, 0.0, 0.0, 10000.0, 10000.0, 10000.0, 10000.0);
+fw_PID_Regulator_t pitchPositionPID = fw_PID_INIT(2.0, 0.0, 0.0, 10000.0, 10000.0, 10000.0, 10000.0);
 fw_PID_Regulator_t yawPositionPID = fw_PID_INIT(5.0, 0.0, 0.5, 10000.0, 10000.0, 10000.0, 10000.0);
-fw_PID_Regulator_t pitchSpeedPID = fw_PID_INIT(20.0, 0.0, 0.0, 10000.0, 10000.0, 10000.0, 3500.0); //KP不能超过30
+fw_PID_Regulator_t pitchSpeedPID = fw_PID_INIT(5.0, 0.0, 0.0, 10000.0, 10000.0, 10000.0, 3500.0); //KP不能超过30
 fw_PID_Regulator_t yawSpeedPID = fw_PID_INIT(10.0, 0.0, 0, 10000.0, 10000.0, 10000.0, 2000.0);
 #define yaw_zero 7200  
-#define pitch_zero 5796
+#define pitch_zero 5442
 float yawRealAngle = 0.0;
 float pitchRealAngle = 0.0;
 float gap_angle = 0.0;
@@ -358,7 +358,7 @@ void ControlPitch(void)
 
 	MINMAX(pitchAngleTarget, PITCHANGLETARGETMIN1, PITCHANGLETARGETMAX1);
 				
-	pitchIntensity = -ProcessPitchPID(pitchAngleTarget,pitchRealAngle,-MPU6050_Real_Data.Gyro_X);
+	pitchIntensity = ProcessPitchPID(pitchAngleTarget,pitchRealAngle,-MPU6050_Real_Data.Gyro_X);
 }
 
 float enemy_yaw_err = 0;
