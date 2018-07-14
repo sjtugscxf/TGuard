@@ -26,6 +26,23 @@ void FricCanReceiveMsgProcess(CanRxMsg * msg)
 				FRICRRx.angle = ((uint16_t)msg->Data[0]<<8)|(uint16_t)msg->Data[1];
 				FRICRRx.RotateSpeed = ((uint16_t)msg->Data[2]<<8)|(uint16_t)msg->Data[3];
 				break;
+			case UPMSG_RXID:
+				if(msgcanalive == 0)
+				{
+					redBuf = msg->Data[0] & 0x0F;
+					gameProgress = (msg->Data[0]>>4)& 0x0F;
+					bulletFreq = msg->Data[1];
+					shooterHeat0 = (0x0000 | msg->Data[2]) | (msg->Data[3]<<8);
+					unsigned char * b = NULL;
+					b = (unsigned char*)&bulletSpeed;
+					char c[4] = {0};
+					c[0] = msg->Data[4];c[1] = msg->Data[5];c[2] = msg->Data[6];c[3] = msg->Data[7];
+					for(int i = 0; i<4; i++){
+						b[i] = (unsigned char)c[i];
+						bulletSpeedBuf[i] = msg->Data[i+4];
+					}
+			  }
+				break;
 			
 				default:
 				{
@@ -62,6 +79,8 @@ void CanReceiveMsgProcess(CanRxMsg * msg)
 				GMPITCHRx.angle = ((uint16_t)msg->Data[0]<<8)|(uint16_t)msg->Data[1];
 				break;
 			case UPMSG_RXID:
+				msgcanalivecnt = 0;
+			  msgcanalive = 1;
 				redBuf = msg->Data[0] & 0x0F;
 				gameProgress = (msg->Data[0]>>4)& 0x0F;
 				bulletFreq = msg->Data[1];

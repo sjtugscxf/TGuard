@@ -526,8 +526,20 @@ void Attack_Action()
 	}
 }
 
+unsigned int msgcanalivecnt = 0;
+unsigned int msgcanalive = 1;
 void controlLoop()
 {
+	if(msgcanalivecnt<2000) 
+	{
+		msgcanalivecnt++;
+		msgcanalive = 1;
+	}
+	else
+	{
+		msgcanalive = 0;
+	}
+	
 	if(target_hero == 0) pitchAngleTargetMax = PITCHANGLETARGETMAX2;
 	else pitchAngleTargetMax = PITCHANGLETARGETMAX1;
 	

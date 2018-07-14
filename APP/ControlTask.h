@@ -205,5 +205,8 @@ extern float fricrSpeedTarget;
 
 void CMControlInit(void);
 void SetFrictionWheelSpeed(float x);
+
+extern unsigned int msgcanalivecnt;
+extern unsigned int msgcanalive;
 #endif
 
