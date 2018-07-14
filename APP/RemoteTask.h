@@ -122,7 +122,7 @@ void InitRemoteControl();
 void RemoteTaskInit();
 
 #define FRICTION_RAMP_TICK_COUNT				100
-#define FRICTION_WHEEL_MAX_DUTY         400
+#define FRICTION_WHEEL_MAX_DUTY         540
 #define FRICTION_TIM  htim12
 
 typedef __packed enum
