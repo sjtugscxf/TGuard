@@ -543,7 +543,7 @@ void controlLoop()
 	if(target_hero == 0) pitchAngleTargetMax = PITCHANGLETARGETMAX2;
 	else pitchAngleTargetMax = PITCHANGLETARGETMAX1;
 	
-	if((enemy_pitch > ((pitchAngleTargetMax-pitchAngleTarget) * 3 + 310)) && pitchAngleTarget >20) enemy_far = 1;
+	if((enemy_pitch > ((PITCHREALANGLEMAX-pitchRealAngle) * 5 + 270)) && pitchRealAngle >15) enemy_far = 1;
 	else enemy_far = 0;
 	
 	if(target_hero == 0) 
